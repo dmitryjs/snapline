@@ -2,18 +2,13 @@
 <h1 align="center">Snapline</h1>
 <p align="center">Запись экрана и монтаж скринкастов на Windows и Mac.</p>
 
-**Распространение версии 0.9.1 приостановлено до выяснения причин антивирусных срабатываний.**
 <p align="center"><a href="#install">Установка</a> · <a href="#editor">Редактор</a> · <a href="https://github.com/dmitryjs/snapline/releases">Все версии</a></p>
-
-## Проверка VirusTotal
-
-**26 ноября 2026 года.** Проверены основные исполняемые файлы из опубликованных ZIP. Windows — **3 из 62** (CrowdStrike Falcon, DrWeb, SecureAge). macOS — **1 из 62** (Microsoft, Trojan:Script/Wacatac.B!ml). Причины срабатываний пока не установлены. До окончания разбора рекомендуем отложить запуск. Отчёты относятся только к указанным файлам.
-
-[Отчёт Windows — Snapline.exe](https://www.virustotal.com/gui/file/e68705fdbf74209dd279f551ffe27206817c5ed79062c842a9f84a78b140e286) · [Отчёт macOS — Snapline.app/Contents/MacOS/Snapline](https://www.virustotal.com/gui/file/34995906eb417cbe5c806e2e425ca61f9aec462e3227b16ab1cec1b2695f5f24)
 
 <a id="install"></a>
 
 ## Установка
+
+Snapline 0.9.1 — ранняя версия. Некоторые антивирусы выдают предупреждения для сборок Windows и macOS. Я пока выясняю причину.
 
 | Система | Как запустить |
 | --- | --- |
