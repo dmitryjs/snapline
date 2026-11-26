@@ -44,9 +44,9 @@ partial class Editor:Shell {
         InitStyle();
         InitTimelineEditing();
         automatic.IsChecked=automatic.IsEnabled=camera.Sections>0;
-        Get<TextBlock>("CameraInfo").Text=damaged?Language.Pick("Файл движения курсора не читается.", "Could not read cursor movement file."):camera.Sections>0?
-            Language.Pick("Эпизодов по кликам: ", "Click zooms: ")+camera.Sections:File.Exists(CameraTrack.Sidecar(path))?
-            Language.Pick("Без кликов кадр остаётся общим.", "The full frame stays visible between clicks."):Language.Pick("Для этого видео доступен ручной зум. Нажми на точку в кадре.", "Manual zoom is available for this video. Click a point in the frame.");
+        Get<TextBlock>("CameraInfo").Text=damaged?InterfaceLanguage.Pick("Файл движения курсора не читается.", "Could not read cursor movement file."):camera.Sections>0?
+            InterfaceLanguage.Pick("Эпизодов по кликам: ", "Click zooms: ")+camera.Sections:File.Exists(CameraTrack.Sidecar(path))?
+            InterfaceLanguage.Pick("Без кликов кадр остаётся общим.", "The full frame stays visible between clicks."):InterfaceLanguage.Pick("Для этого видео доступен ручной зум. Нажми на точку в кадре.", "Manual zoom is available for this video. Click a point in the frame.");
         automatic.Click+=(s,e)=>{Range();Paint(position.Value);};
         shot.RenderTransform=cameraTransform;
         shot.MouseLeftButtonDown+=(s,e)=>{
@@ -73,12 +73,12 @@ partial class Editor:Shell {
         stage.SizeChanged+=(s,e)=>{if(framing==null)Layout();else FitPreview();};
         position.ValueChanged+=(s,e)=>{if(!changing&&ready){if(decoded==null)player.Position=TimeSpan.FromSeconds(position.Value);else{decoded.Dispose();seek.Stop();seek.Start();}Paint(position.Value);}};
         var fileMenu=new ContextMenu();
-        foreach(var pair in new[]{Tuple.Create(Language.Pick("Показать исходный файл", "Show source file"),"Reveal"),Tuple.Create(Language.Pick("Экспортировать MP4…", "Export MP4…"),"Export")}){
+        foreach(var pair in new[]{Tuple.Create(InterfaceLanguage.Pick("Показать исходный файл", "Show source file"),"Reveal"),Tuple.Create(InterfaceLanguage.Pick("Экспортировать MP4…", "Export MP4…"),"Export")}){
             var item=new MenuItem{Header=pair.Item1};string id=pair.Item2;item.Click+=(s,e)=>Get<Button>(id).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));fileMenu.Items.Add(item);
         }
         Bind("FileMenu",()=>{fileMenu.PlacementTarget=Get<Button>("FileMenu");fileMenu.IsOpen=true;});
         var trimMenu=new ContextMenu();
-        foreach(var pair in new[]{Tuple.Create(Language.Pick("Удалить до указателя", "Delete before playhead"),"MarkIn"),Tuple.Create(Language.Pick("Удалить после указателя", "Delete after playhead"),"MarkOut"),Tuple.Create(Language.Pick("Восстановить длину", "Restore full length"),"Reset")}){
+        foreach(var pair in new[]{Tuple.Create(InterfaceLanguage.Pick("Удалить до указателя", "Delete before playhead"),"MarkIn"),Tuple.Create(InterfaceLanguage.Pick("Удалить после указателя", "Delete after playhead"),"MarkOut"),Tuple.Create(InterfaceLanguage.Pick("Восстановить длину", "Restore full length"),"Reset")}){
             string id=pair.Item2;var item=new MenuItem{Header=pair.Item1};item.Click+=(s,e)=>Get<Button>(id).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));trimMenu.Items.Add(item);
         }
         Bind("TrimMenu",()=>{if(!ready)return;trimMenu.PlacementTarget=Get<Button>("TrimMenu");trimMenu.IsOpen=true;});
@@ -110,14 +110,14 @@ partial class Editor:Shell {
         timer.Tick+=(s,e)=>{if(ready&&playing&&decoded==null&&!position.IsMouseCaptureWithin)SetPosition(player.Position.TotalSeconds);};
         win.Loaded+=async(s,e)=>{
             try{
-                if(!File.Exists(path)){Failure(Language.Pick("Видео отсутствует в папке записи. ", "No video in the recording folder. ")+path);return;}
+                if(!File.Exists(path)){Failure(InterfaceLanguage.Pick("Видео отсутствует в папке записи. ", "No video in the recording folder. ")+path);return;}
                 sourceLock=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read);
                 try{info=await MovieInfo.Read(path);}catch(Exception ex){if(!closed)Failure(ex.Message);return;}
                 if(closed)return;
                 timer.Start();opening.Start();player.Source=new Uri(path,UriKind.Absolute);player.Play();
             }catch(Exception ex){if(info!=null)Fallback();else Failure(ex.Message);}
         };
-        win.Closing+=(s,e)=>{if(exporting){e.Cancel=true;Get<TextBlock>("Note").Text=Language.Pick("Подожди завершения экспорта", "Wait for export to finish");}};
+        win.Closing+=(s,e)=>{if(exporting){e.Cancel=true;Get<TextBlock>("Note").Text=InterfaceLanguage.Pick("Подожди завершения экспорта", "Wait for export to finish");}};
         win.Closed+=(s,e)=>{closed=true;timer.Stop();opening.Stop();seek.Stop();if(decoded!=null)decoded.Dispose();player.Close();if(sourceLock!=null)sourceLock.Dispose();};
     }
     void SetPosition(double t){
@@ -157,14 +157,14 @@ partial class Editor:Shell {
     }
     void PlayIcon(bool active){
         Get<System.Windows.Shapes.Path>("PlayIcon").Data=Geometry.Parse(active?"M8,4 L8,20 M16,4 L16,20":"M7,4 L19,12 7,20 Z");
-        Get<Button>("Play").ToolTip=active?Language.Pick("Пауза", "Pause"):Language.Pick("Воспроизвести", "Play");
+        Get<Button>("Play").ToolTip=active?InterfaceLanguage.Pick("Пауза", "Pause"):InterfaceLanguage.Pick("Воспроизвести", "Play");
     }
     void Pause(){seek.Stop();if(decoded==null)player.Pause();else decoded.Dispose();playing=false;PlayIcon(false);}
     void Range(){
         position.UpdateClip(duration,start,end,zoom,automatic.IsChecked==true,annotations,autoScale);
-        Get<TextBlock>("Note").Text=string.Format(Language.Pick("Фрагмент   {0:0.00} — {1:0.00} с    ·    {2:0.00} с", "Clip   {0:0.00} — {1:0.00} s    ·    {2:0.00} s"),start,end,end-start)
-            +(decoded==null?"":Language.Pick("     Резервный просмотр без звука", "     Fallback preview without audio"))
-            +(zoom>=0?string.Format(Language.Pick("     Зум   {0:0.00} — {1:0.00} с", "     Zoom   {0:0.00} — {1:0.00} s"),zoom,Math.Min(duration,zoom+2)):"");
+        Get<TextBlock>("Note").Text=string.Format(InterfaceLanguage.Pick("Фрагмент   {0:0.00} — {1:0.00} с    ·    {2:0.00} с", "Clip   {0:0.00} — {1:0.00} s    ·    {2:0.00} s"),start,end,end-start)
+            +(decoded==null?"":InterfaceLanguage.Pick("     Резервный просмотр без звука", "     Fallback preview without audio"))
+            +(zoom>=0?string.Format(InterfaceLanguage.Pick("     Зум   {0:0.00} — {1:0.00} с", "     Zoom   {0:0.00} — {1:0.00} s"),zoom,Math.Min(duration,zoom+2)):"");
     }
     void Layout(){
         if(exporting||!ready||stage.ActualWidth<1||stage.ActualHeight<1)return;
@@ -208,7 +208,7 @@ partial class Editor:Shell {
         string workDir=null;
         try{
             exporting=true;((UIElement)win.Content).IsEnabled=false;
-            Get<TextBlock>("Note").Text=Language.Pick("Экспортируем фрагмент…", "Exporting clip…");
+            Get<TextBlock>("Note").Text=InterfaceLanguage.Pick("Экспортируем фрагмент…", "Exporting clip…");
             bool auto=automatic.IsChecked==true,motion=auto||zoom>=0;
             workDir=Path.Combine(Path.GetTempPath(),"Snapline-"+Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(workDir);
@@ -223,8 +223,8 @@ partial class Editor:Shell {
             if(await render.Wait()!=0)throw new IOException(render.Log);
             await MovieInfo.Read(tmp);
             if(File.Exists(target))File.Replace(tmp,target,null);else File.Move(tmp,target);
-            Get<TextBlock>("Note").Text=Language.Pick("Сохранено: ", "Saved: ")+target;
-        }catch(Exception ex){Alert(Language.Pick("Ошибка экспорта. ", "Export error. ")+ex.Message);Range();}
+            Get<TextBlock>("Note").Text=InterfaceLanguage.Pick("Сохранено: ", "Saved: ")+target;
+        }catch(Exception ex){Alert(InterfaceLanguage.Pick("Ошибка экспорта. ", "Export error. ")+ex.Message);Range();}
         finally{exporting=false;Layout();((UIElement)win.Content).IsEnabled=true;if(render!=null)render.Dispose();render=null;try{if(workDir!=null && Directory.Exists(workDir))Directory.Delete(workDir,true);if(File.Exists(tmp))File.Delete(tmp);}catch(IOException){}}
     }
 }

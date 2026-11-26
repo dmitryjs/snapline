@@ -4,7 +4,7 @@ using System.Windows.Controls;
 namespace Navodka {
 static class VideoQuality {
     public static readonly string[] Sizes={"720p","1080p","1440p","2160p · 4K"};
-    public static readonly string[] Levels={Language.Pick("Стандартное", "Standard"),Language.Pick("Высокое", "High"),Language.Pick("Максимальное", "Maximum")};
+    public static readonly string[] Levels={InterfaceLanguage.Pick("Стандартное", "Standard"),InterfaceLanguage.Pick("Высокое", "High"),InterfaceLanguage.Pick("Максимальное", "Maximum")};
     static readonly int[] LongSide={1280,1920,2560,3840},ShortSide={720,1080,1440,2160};
     public static void Populate(ComboBox combo,string[] options,int index){
         foreach(var option in options)combo.Items.Add(option);combo.SelectedIndex=index;

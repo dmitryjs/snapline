@@ -31,11 +31,11 @@ partial class Editor {
         Bind("FxTab",()=>ShowTab(2));
         InitCanvas();
         Bind("Picture",()=>{
-            var dlg=new Microsoft.Win32.OpenFileDialog{Filter=Language.Pick("Изображения|*.jpg;*.jpeg;*.png;*.bmp", "Images|*.jpg;*.jpeg;*.png;*.bmp")};
+            var dlg=new Microsoft.Win32.OpenFileDialog{Filter=InterfaceLanguage.Pick("Изображения|*.jpg;*.jpeg;*.png;*.bmp", "Images|*.jpg;*.jpeg;*.png;*.bmp")};
             if(dlg.ShowDialog(win)!=true)return;
             try{var bitmap=LocalPicture.Read(dlg.FileName);
                 picture=new ImageBrush(bitmap){Stretch=Stretch.UniformToFill};SelectBackground(7);
-            }catch(Exception ex){Alert(Language.Pick("Не удалось открыть фон. ", "Could not open the background. ")+ex.Message);}
+            }catch(Exception ex){Alert(InterfaceLanguage.Pick("Не удалось открыть фон. ", "Could not open the background. ")+ex.Message);}
         });
         pointer=new PointerLayer(camera);Get<Canvas>("SceneBase").Children.Add(pointer);
         InitPointer();
@@ -46,7 +46,7 @@ partial class Editor {
         string[] ids={"Spot","Blur","Lens","Magnifier"};
         for(int i=0;i<ids.Length;i++){
             int n=i;Bind(ids[i],()=>{if(!ready)return;Pause();Get<ListBox>("FxList").SelectedIndex=-1;tool=n;MaskButtons();shot.Cursor=Cursors.Cross;
-                Get<TextBlock>("FxHint").Text=Language.Pick("Протяни мышью рамку по видео.", "Drag to draw a rectangle on the video.");});
+                Get<TextBlock>("FxHint").Text=InterfaceLanguage.Pick("Протяни мышью рамку по видео.", "Drag to draw a rectangle on the video.");});
         }
         var list=Get<ListBox>("FxList");
         list.SelectionChanged+=(s,e)=>{var a=list.SelectedItem as Annotation;HistoryButtons();if(a==null)return;position.Selected=-1;position.ManualSelected=false;Pause();position.Value=a.Start;
@@ -74,7 +74,7 @@ partial class Editor {
                     var a=new Annotation{Start=at,End=Math.Min(duration,at+len),Kind=tool,
                         Bounds=new Rect(framing.ToSource(first,info.Width,info.Height),framing.ToSource(last,info.Width,info.Height))};
                     Remember();annotations.Add(a);list.Items.Add(a);list.SelectedItem=a;tool=-1;MaskButtons();shot.Cursor=null;Range();
-                    Get<TextBlock>("FxHint").Text=Language.Pick("Выбери следующий эффект или запись в списке.", "Select the next effect or recording in the list.");
+                    Get<TextBlock>("FxHint").Text=InterfaceLanguage.Pick("Выбери следующий эффект или запись в списке.", "Select the next effect or recording in the list.");
                 }
             }
             StyleFrame(position.Value,true);e.Handled=true;

@@ -29,7 +29,7 @@ class Shell {
             using(var stream=assembly.GetManifestResourceStream("Theme.xaml"))
                 Application.Current.Resources.MergedDictionaries.Add((ResourceDictionary)XamlReader.Load(stream));
         }
-        using(var stream=assembly.GetManifestResourceStream(view))win=(Window)Language.LoadView(stream);
+        using(var stream=assembly.GetManifestResourceStream(view))win=(Window)InterfaceLanguage.LoadView(stream);
         LoadArt(Get<Image>("Brand"),"brand.png");
         var chrome=new System.Windows.Shell.WindowChrome{CaptionHeight=0,GlassFrameThickness=new Thickness(0),
             CornerRadius=new CornerRadius(0),ResizeBorderThickness=new Thickness(view=="Editor.xaml"?5:0)};
@@ -72,7 +72,7 @@ class Worker : IDisposable {
     public Task<int> Wait(int timeoutMs=-1){return Task.Run(()=>{
         if(!Child.WaitForExit(timeoutMs)){
             try{Child.Kill();}catch(InvalidOperationException){}
-            Child.WaitForExit();throw new IOException(Language.Pick("Файл не удалось прочитать за отведённое время.", "Reading the file timed out."));
+            Child.WaitForExit();throw new IOException(InterfaceLanguage.Pick("Файл не удалось прочитать за отведённое время.", "Reading the file timed out."));
         }
         Child.WaitForExit();return Child.ExitCode;
     });}

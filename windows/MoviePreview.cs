@@ -17,19 +17,19 @@ sealed class MovieInfo {
     public double Seconds;
     public int Width,Height;public bool HasAudio;
     public static async Task<MovieInfo> Read(string path){
-        if(!File.Exists(path))throw new FileNotFoundException(Language.Pick("Видео отсутствует в папке записи.", "No video in the recording folder."),path);
+        if(!File.Exists(path))throw new FileNotFoundException(InterfaceLanguage.Pick("Видео отсутствует в папке записи.", "No video in the recording folder."),path);
         using(var probe=new Worker("ffmpeg","-hide_banner","-nostdin","-progress","pipe:2","-protocol_whitelist","file","-format_whitelist",Containers,"-max_pixels",MaxPixels,"-i",path,"-map","0:v:0","-frames:v","1","-vf","scale=2:2","-pix_fmt","bgra","-threads:v","1","-c:v","rawvideo","-f","rawvideo","-y","NUL")){
             int code=await probe.Wait(30000);
             string log=probe.Log;
             var duration=Regex.Match(log,@"(?m)^  Duration:\s*(\d+):(\d+):([\d.]+)");
             var size=Regex.Match(log,@"(?m)^  Stream #0:[^\r\n]*?Video:[^\r\n]*?\b(\d{2,5})x(\d{2,5})\b");
             if(code!=0||!size.Success||!duration.Success||!Regex.IsMatch(log,@"(?m)^frame=[1-9]"))
-                throw new InvalidDataException(Language.Pick("Не удалось прочитать видеокадр или длительность. Файл сохранён по адресу ", "Could not read the video frame or duration. File saved at ")+path);
+                throw new InvalidDataException(InterfaceLanguage.Pick("Не удалось прочитать видеокадр или длительность. Файл сохранён по адресу ", "Could not read the video frame or duration. File saved at ")+path);
             double seconds=int.Parse(duration.Groups[1].Value)*3600+int.Parse(duration.Groups[2].Value)*60+double.Parse(duration.Groups[3].Value,CultureInfo.InvariantCulture);
-            if(seconds<=0)throw new InvalidDataException(Language.Pick("Длительность видео равна нулю. ", "Video duration is zero. ")+path);
+            if(seconds<=0)throw new InvalidDataException(InterfaceLanguage.Pick("Длительность видео равна нулю. ", "Video duration is zero. ")+path);
             int w=int.Parse(size.Groups[1].Value),h=int.Parse(size.Groups[2].Value);
             if((long)w*h>33554432 || seconds>int.MaxValue/1000.0)
-                throw new InvalidDataException(Language.Pick("Размер или длительность записи превышают поддерживаемый предел.", "Recording size or duration exceeds the supported limit."));
+                throw new InvalidDataException(InterfaceLanguage.Pick("Размер или длительность записи превышают поддерживаемый предел.", "Recording size or duration exceeds the supported limit."));
             return new MovieInfo{Width=w,Height=h,Seconds=seconds,HasAudio=Regex.IsMatch(log,@"(?m)^  Stream #0:[^\r\n]*?Audio:")};
         }
     }
@@ -79,7 +79,7 @@ sealed class MoviePreview : IDisposable {
                 }
                 proc.WaitForExit();return index;
             });
-            if(token==generation && (play||count==0))ended(count==0||proc.ExitCode!=0?Language.Pick("Не удалось декодировать кадр.", "Could not decode frame."):null);
+            if(token==generation && (play||count==0))ended(count==0||proc.ExitCode!=0?InterfaceLanguage.Pick("Не удалось декодировать кадр.", "Could not decode frame."):null);
         }catch(Exception ex){if(token==generation)ended(ex.Message);}
         finally{if(active==proc)active=null;proc.Dispose();}
     }

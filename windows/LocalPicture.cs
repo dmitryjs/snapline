@@ -6,9 +6,9 @@ namespace Navodka {
 static class LocalPicture {
     public static BitmapImage Read(string path){
         using(var input=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read)){
-            if(input.Length>128L*1024*1024)throw new InvalidDataException(Language.Pick("Фон превышает 128 МБ.", "Background exceeds 128 MB."));
+            if(input.Length>128L*1024*1024)throw new InvalidDataException(InterfaceLanguage.Pick("Фон превышает 128 МБ.", "Background exceeds 128 MB."));
             var signature=new byte[8];
-            if(input.Read(signature,0,8)!=8)throw new InvalidDataException(Language.Pick("Файл изображения неполный.", "Incomplete image file."));
+            if(input.Read(signature,0,8)!=8)throw new InvalidDataException(InterfaceLanguage.Pick("Файл изображения неполный.", "Incomplete image file."));
             input.Position=0;
             var options=BitmapCreateOptions.DelayCreation;
             BitmapDecoder decoder;
@@ -18,10 +18,10 @@ static class LocalPicture {
                 decoder=new JpegBitmapDecoder(input,options,BitmapCacheOption.None);
             else if(signature[0]==66 && signature[1]==77)
                 decoder=new BmpBitmapDecoder(input,options,BitmapCacheOption.None);
-            else throw new InvalidDataException(Language.Pick("Выберите файл PNG, JPEG или BMP.", "Choose a PNG, JPEG or BMP file."));
+            else throw new InvalidDataException(InterfaceLanguage.Pick("Выберите файл PNG, JPEG или BMP.", "Choose a PNG, JPEG or BMP file."));
             int w=decoder.Frames[0].PixelWidth,h=decoder.Frames[0].PixelHeight;
             if(w<=0||h<=0||w>32768||h>32768||(long)w*h>100000000)
-                throw new InvalidDataException(Language.Pick("Слишком большое исходное изображение для фона.", "Background image is too large."));
+                throw new InvalidDataException(InterfaceLanguage.Pick("Слишком большое исходное изображение для фона.", "Background image is too large."));
             input.Position=0;
             var image=new BitmapImage();image.BeginInit();image.CacheOption=BitmapCacheOption.OnLoad;
             if(w>=h && w>2560)image.DecodePixelWidth=2560;

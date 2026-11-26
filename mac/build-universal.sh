@@ -13,5 +13,6 @@ done
 xcrun lipo -create "$tmp/x86_64" "$tmp/arm64" -output "$bundle/Contents/MacOS/Snapline"
 cp Info-Intel.plist "$bundle/Contents/Info.plist"
 cp Snapline.icns "$bundle/Contents/Resources/"
+cp -R en.lproj ru.lproj "$bundle/Contents/Resources/"
 codesign --force --sign - "$bundle"
 codesign --verify --strict "$bundle"

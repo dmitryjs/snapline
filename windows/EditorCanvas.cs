@@ -38,7 +38,7 @@ partial class Editor {
         foreach(var c in "BCD0FF 6DE9F6 55D5E6 9CD6B6 FFE678 FFCDD9 E9B9FF 9AAACB F2F4F8 CBE7D0 CFEC98 F9EA99 FEC36E F09299".Split(' '))papers.Add(new SolidColorBrush(Ink(c)));
         for(int i=0;i<papers.Count;i++){
             int n=i;var b=new Button{Height=25,Margin=new Thickness(3,3,3,3),Background=papers[i],Padding=new Thickness(0),
-                ToolTip=i<4||i>=solidStart?Language.Pick("Цвет фона", "Background color"):Language.Pick("Градиент ", "Gradient ")+i};
+                ToolTip=i<4||i>=solidStart?InterfaceLanguage.Pick("Цвет фона", "Background color"):InterfaceLanguage.Pick("Градиент ", "Gradient ")+i};
             b.Click+=(sender,e)=>SelectBackground(n);swatches.Add(b);
             if(i<4 || i>=solidStart)Get<System.Windows.Controls.Primitives.UniformGrid>("PaintGallery").Children.Add(b);
         }
@@ -56,13 +56,13 @@ partial class Editor {
         for(int i=0;i<4;i++)Get<Button>("Group"+i).Tag=i==group?"chosen":null;
     }
     void ChooseSize(){
-        var dialog=new Window{Owner=win,Title=Language.Pick("Размер холста", "Canvas size"),SizeToContent=SizeToContent.WidthAndHeight,WindowStartupLocation=WindowStartupLocation.CenterOwner,
+        var dialog=new Window{Owner=win,Title=InterfaceLanguage.Pick("Размер холста", "Canvas size"),SizeToContent=SizeToContent.WidthAndHeight,WindowStartupLocation=WindowStartupLocation.CenterOwner,
             ResizeMode=ResizeMode.NoResize,Background=win.Background,Foreground=win.Foreground};
         var panel=new StackPanel{Margin=new Thickness(18)};dialog.Content=panel;
         TextBox w=new TextBox{Text=customWidth.ToString()},h=new TextBox{Text=customHeight.ToString()};
-        foreach(var item in new[]{Tuple.Create(Language.Pick("Ширина, пикс.", "Width, px"),w),Tuple.Create(Language.Pick("Высота, пикс.", "Height, px"),h)}){panel.Children.Add(new TextBlock{Text=item.Item1});panel.Children.Add(item.Item2);}
-        var message=new TextBlock{Text=Language.Pick("Чётные значения от 64 до 4096", "Even values from 64 to 4096"),Margin=new Thickness(0,8,0,8)};panel.Children.Add(message);
-        var ok=new Button{Content=Language.Pick("Применить", "Apply"),IsDefault=true};panel.Children.Add(ok);ok.Click+=(s,e)=>{
+        foreach(var item in new[]{Tuple.Create(InterfaceLanguage.Pick("Ширина, пикс.", "Width, px"),w),Tuple.Create(InterfaceLanguage.Pick("Высота, пикс.", "Height, px"),h)}){panel.Children.Add(new TextBlock{Text=item.Item1});panel.Children.Add(item.Item2);}
+        var message=new TextBlock{Text=InterfaceLanguage.Pick("Чётные значения от 64 до 4096", "Even values from 64 to 4096"),Margin=new Thickness(0,8,0,8)};panel.Children.Add(message);
+        var ok=new Button{Content=InterfaceLanguage.Pick("Применить", "Apply"),IsDefault=true};panel.Children.Add(ok);ok.Click+=(s,e)=>{
             int x,y;if(!int.TryParse(w.Text,out x)||!int.TryParse(h.Text,out y)||x<64||y<64||x>4096||y>4096||x%2!=0||y%2!=0){message.Foreground=Brushes.Orange;return;}
             customWidth=x;customHeight=y;format=5;Choices();Layout();dialog.DialogResult=true;
         };dialog.ShowDialog();

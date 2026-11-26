@@ -37,9 +37,9 @@ sealed class RecordingHud : Form {
         time.MouseDown+=(s,e)=>{if(e.Button==MouseButtons.Left){drag=e.Location;time.Capture=true;}};
         time.MouseMove+=(s,e)=>{if(e.Button==MouseButtons.Left && time.Capture)Location=new Point(Left+e.X-drag.X,Top+e.Y-drag.Y);};
         time.MouseUp+=(s,e)=>time.Capture=false;
-        Configure(pause,89,81,Language.Pick("Пауза", "Pause"),toggle);Configure(stop,174,65,Language.Pick("Стоп", "Stop"),finish);
+        Configure(pause,89,81,InterfaceLanguage.Pick("Пауза", "Pause"),toggle);Configure(stop,174,65,InterfaceLanguage.Pick("Стоп", "Stop"),finish);
         tray.MouseUp+=(s,e)=>{if(e.Button==MouseButtons.Right)finish();else if(e.Button==MouseButtons.Left&&pauseEnabled)toggle();};
-        tray.Icon=SystemIcons.Application;tray.Text=Language.Pick("Snapline · слева пауза, справа стоп", "Snapline · Left-click to pause, right-click to stop");
+        tray.Icon=SystemIcons.Application;tray.Text=InterfaceLanguage.Pick("Snapline · слева пауза, справа стоп", "Snapline · Left-click to pause, right-click to stop");
         timer.Tick+=(s,e)=>time.Text=(elapsed.IsRunning?"● ":"Ⅱ ")+(int)elapsed.Elapsed.TotalMinutes+":"+elapsed.Elapsed.Seconds.ToString("00");
     }
     void Configure(Button b,int x,int w,string label,Action action){
@@ -88,8 +88,8 @@ sealed class RecordingHud : Form {
     }
     public void State(bool paused,bool enabled){
         if(paused)elapsed.Stop();else elapsed.Start();
-        pause.Text=paused?Language.Pick("Продолжить", "Resume"):Language.Pick("Пауза", "Pause");pause.Enabled=enabled;
-        pauseEnabled=enabled;tray.Text=paused?Language.Pick("Snapline · слева продолжить, справа стоп", "Snapline · Left-click to resume, right-click to stop"):Language.Pick("Snapline · слева пауза, справа стоп", "Snapline · Left-click to pause, right-click to stop");
+        pause.Text=paused?InterfaceLanguage.Pick("Продолжить", "Resume"):InterfaceLanguage.Pick("Пауза", "Pause");pause.Enabled=enabled;
+        pauseEnabled=enabled;tray.Text=paused?InterfaceLanguage.Pick("Snapline · слева продолжить, справа стоп", "Snapline · Left-click to resume, right-click to stop"):InterfaceLanguage.Pick("Snapline · слева пауза, справа стоп", "Snapline · Left-click to pause, right-click to stop");
     }
     protected override void WndProc(ref Message m){if(m.Msg==0x312 && m.WParam.ToInt32()==1){finish();return;}base.WndProc(ref m);}
     protected override void Dispose(bool disposing){

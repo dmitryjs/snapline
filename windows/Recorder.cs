@@ -24,7 +24,7 @@ class Recorder:Shell {
     bool microphone;
     readonly ContextMenu fileMenu=new ContextMenu();
     MenuItem folderMenu;
-    readonly MenuItem systemCursor=new MenuItem{Header=Language.Pick("Записывать системный курсор", "Record system cursor"),IsCheckable=true,IsChecked=false};
+    readonly MenuItem systemCursor=new MenuItem{Header=InterfaceLanguage.Pick("Записывать системный курсор", "Record system cursor"),IsCheckable=true,IsChecked=false};
     string mode="monitor",folder;
     readonly string settings=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Navodka","folder.txt");
     Rectangle? region;
@@ -50,16 +50,16 @@ class Recorder:Shell {
         try{if(File.Exists(settings)&&Directory.Exists(File.ReadAllText(settings)))folder=File.ReadAllText(settings);}catch(IOException){}
 
         Bind("ScreenBtn",()=>SetMode("monitor"));Bind("WindowBtn",()=>SetMode("window"));Bind("AreaBtn",PickArea);
-        AddMenu(Language.Pick("Обновить устройства", "Refresh devices"),()=>{RefreshTargets();RefreshMics();});
-        folderMenu=AddMenu(Language.Pick("Папка для записей…", "Recording folder…"),()=>{using(var p=new Forms.FolderBrowserDialog()){p.SelectedPath=folder;if(p.ShowDialog()==Forms.DialogResult.OK){folder=p.SelectedPath;try{Directory.CreateDirectory(Path.GetDirectoryName(settings));File.WriteAllText(settings,folder);}catch(IOException){} }}});
-        AddMenu(Language.Pick("Открыть видео…", "Open video…"),()=>{var p=new Microsoft.Win32.OpenFileDialog{Filter=Language.Pick("Видео|*.mp4;*.mov;*.m4v;*.wmv", "Video|*.mp4;*.mov;*.m4v;*.wmv")};if(p.ShowDialog(win)==true)Open(p.FileName);});
+        AddMenu(InterfaceLanguage.Pick("Обновить устройства", "Refresh devices"),()=>{RefreshTargets();RefreshMics();});
+        folderMenu=AddMenu(InterfaceLanguage.Pick("Папка для записей…", "Recording folder…"),()=>{using(var p=new Forms.FolderBrowserDialog()){p.SelectedPath=folder;if(p.ShowDialog()==Forms.DialogResult.OK){folder=p.SelectedPath;try{Directory.CreateDirectory(Path.GetDirectoryName(settings));File.WriteAllText(settings,folder);}catch(IOException){} }}});
+        AddMenu(InterfaceLanguage.Pick("Открыть видео…", "Open video…"),()=>{var p=new Microsoft.Win32.OpenFileDialog{Filter=InterfaceLanguage.Pick("Видео|*.mp4;*.mov;*.m4v;*.wmv", "Video|*.mp4;*.mov;*.m4v;*.wmv")};if(p.ShowDialog(win)==true)Open(p.FileName);});
         fileMenu.Items.Add(systemCursor);
-        var languages = new MenuItem { Header = Language.Pick("Язык", "Language") };
+        var languages = new MenuItem { Header = InterfaceLanguage.Pick("Язык", "Language") };
         foreach (string code in new[] { "ru", "en" }) {
             var item = new MenuItem { Header = code == "ru" ? "Русский" : "English",
-                IsChecked = (code == "en") == Language.English };
+                IsChecked = (code == "en") == InterfaceLanguage.English };
             item.Click += (sender, args) => {
-                Language.Save(code);
+                InterfaceLanguage.Save(code);
                 foreach (MenuItem option in languages.Items) option.IsChecked = option == item;
                 MessageBox.Show(win, code == "en" ? "English will be used the next time you open Snapline." :
                     "Русский язык включится при следующем запуске Snapline.", "Snapline");
@@ -80,7 +80,7 @@ class Recorder:Shell {
         targets.Items.Clear();
         if(mode=="window"){
             foreach(var p in Process.GetProcesses()){using(p){try{if(p.MainWindowHandle!=IntPtr.Zero&&p.Id!=Process.GetCurrentProcess().Id&&!string.IsNullOrWhiteSpace(p.MainWindowTitle))targets.Items.Add(new TargetItem{Name=p.MainWindowTitle,Handle=p.MainWindowHandle});}catch(InvalidOperationException){}catch(System.ComponentModel.Win32Exception){}}}
-        }else foreach(var s in Forms.Screen.AllScreens)targets.Items.Add(new TargetItem{Name=Language.Pick("Экран ", "Display ")+(targets.Items.Count+1)+" · "+s.Bounds.Width+" × "+s.Bounds.Height,Bounds=s.Bounds,Handle=MonitorFromPoint(new System.Drawing.Point(s.Bounds.Left+1,s.Bounds.Top+1),2)});
+        }else foreach(var s in Forms.Screen.AllScreens)targets.Items.Add(new TargetItem{Name=InterfaceLanguage.Pick("Экран ", "Display ")+(targets.Items.Count+1)+" · "+s.Bounds.Width+" × "+s.Bounds.Height,Bounds=s.Bounds,Handle=MonitorFromPoint(new System.Drawing.Point(s.Bounds.Left+1,s.Bounds.Top+1),2)});
         if(targets.Items.Count>0)targets.SelectedIndex=0;
     }
     async void RefreshMics(){
@@ -104,11 +104,11 @@ class Recorder:Shell {
         inputs.IsEnabled=!busy&&microphone;
         Get<Button>("MicButton").Tag=microphone?"chosen":null;
         Get<Button>("MicButton").Opacity=microphone?1:.65;
-        Get<Button>("MicButton").ToolTip=microphone?Language.Pick("Выключить микрофон", "Disable microphone"):Language.Pick("Включить микрофон", "Enable microphone");
+        Get<Button>("MicButton").ToolTip=microphone?InterfaceLanguage.Pick("Выключить микрофон", "Disable microphone"):InterfaceLanguage.Pick("Включить микрофон", "Enable microphone");
         Get<TextBlock>("MicOff").Visibility=microphone?Visibility.Collapsed:Visibility.Visible;
         foreach(var n in new[]{"ScreenBtn","AreaBtn","WindowBtn"})Get<Button>(n).Tag="card";
         Get<Button>(mode=="window"?"WindowBtn":region.HasValue?"AreaBtn":"ScreenBtn").Tag="chosenCard";
-        targets.ToolTip=region.HasValue?Language.Pick("Область ", "Area ")+region.Value.Width+" × "+region.Value.Height:Convert.ToString(targets.SelectedItem);
+        targets.ToolTip=region.HasValue?InterfaceLanguage.Pick("Область ", "Area ")+region.Value.Width+" × "+region.Value.Height:Convert.ToString(targets.SelectedItem);
         folderMenu.ToolTip=folder;
         RecordBtn.IsEnabled=busy?!stopSent:targets.SelectedItem!=null;
     }
@@ -125,7 +125,7 @@ class Recorder:Shell {
         if(resume!=null)resume.TrySetResult(false);
         if(hud!=null)hud.Hide();
         if(job!=null)job.Stop();
-        Status(Language.Pick("Завершаем запись…", "Finishing recording…"));
+        Status(InterfaceLanguage.Pick("Завершаем запись…", "Finishing recording…"));
     }
     bool UseNativeCapture(TargetItem t,string voice,bool nativeEncoder,System.Drawing.Size source){
         if(!nativeEncoder||region.HasValue||voice!=null||source.Width<=0||source.Height<=0)return false;
@@ -150,9 +150,9 @@ class Recorder:Shell {
     async void Start(){
         var t=targets.SelectedItem as TargetItem;if(t==null)return;
         string voice=microphone?inputs.SelectedItem as string:null;
-        if(microphone&&voice==null){Alert(Language.Pick("Выбери доступный микрофон или отключи запись микрофона.", "Choose an available microphone or turn off microphone recording."));return;}
+        if(microphone&&voice==null){Alert(InterfaceLanguage.Pick("Выбери доступный микрофон или отключи запись микрофона.", "Choose an available microphone or turn off microphone recording."));return;}
         string result=null,parts=null;
-        busy=true;stopSent=false;pausing=false;countdown=new CancellationTokenSource();Update();Get<TextBlock>("RecordLabel").Text=Language.Pick("Отмена", "Cancel");
+        busy=true;stopSent=false;pausing=false;countdown=new CancellationTokenSource();Update();Get<TextBlock>("RecordLabel").Text=InterfaceLanguage.Pick("Отмена", "Cancel");
         CountdownOverlay overlay=null;
         try{
             Directory.CreateDirectory(folder);
@@ -180,17 +180,17 @@ class Recorder:Shell {
                 job=Capture(t,voice,clip,nativeEncoder,nativeCapture,source);
                 if(mode!="window" && Get<CheckBox>("Clicks").IsChecked==true)
                     indicator=new ClickIndicator(region??t.Bounds,p=>hud!=null && hud.Visible && hud.Bounds.Contains(p));
-                Get<TextBlock>("RecordLabel").Text=Language.Pick("Остановить запись", "Stop recording");Status(Language.Pick("Идёт запись экрана", "Recording screen"));
+                Get<TextBlock>("RecordLabel").Text=InterfaceLanguage.Pick("Остановить запись", "Stop recording");Status(InterfaceLanguage.Pick("Идёт запись экрана", "Recording screen"));
                 int code=await job.Wait();long first=job.FirstFrameMs;string log=job.Log;
                 cursor.Dispose();if(indicator!=null){indicator.Dispose();indicator=null;}
                 job.Dispose();job=null;
-                if(code!=0)throw new IOException(Language.Pick("Не удалось завершить захват. ", "Could not finish capture. ")+log.Trim());
+                if(code!=0)throw new IOException(InterfaceLanguage.Pick("Не удалось завершить захват. ", "Could not finish capture. ")+log.Trim());
                 var meta=await MovieInfo.Read(clip);
                 int length=checked((int)Math.Round(meta.Seconds*1000));
                 cursor.Append(motion,first,totalMs,length);totalMs=checked(totalMs+length);
                 cursor=null;clips.Add(clip);
                 if(!pausing||stopSent)break;
-                resume=new TaskCompletionSource<bool>();hud.State(true,true);Status(Language.Pick("Запись на паузе", "Recording paused"));
+                resume=new TaskCompletionSource<bool>();hud.State(true,true);Status(InterfaceLanguage.Pick("Запись на паузе", "Recording paused"));
                 bool again=await resume.Task;resume=null;
                 if(!again||stopSent)break;
                 pausing=false;
@@ -202,17 +202,17 @@ class Recorder:Shell {
                 string manifest=Path.Combine(parts,"clips.txt"),merged=Path.Combine(parts,"merged.mp4");
                 File.WriteAllLines(manifest,clips.Select(c=>"file '"+Path.GetFileName(c)+"'"),new System.Text.UTF8Encoding(false));
                 using(var mux=new Worker("ffmpeg","-hide_banner","-loglevel","error","-f","concat","-auto_convert","0","-safe","1","-i",manifest,"-map","0","-c","copy","-movflags","+faststart","-n",merged)){
-                    if(await mux.Wait()!=0)throw new IOException(Language.Pick("Не удалось соединить фрагменты. ", "Could not join clips. ")+mux.Log);
+                    if(await mux.Wait()!=0)throw new IOException(InterfaceLanguage.Pick("Не удалось соединить фрагменты. ", "Could not join clips. ")+mux.Log);
                 }
                 await MovieInfo.Read(merged);File.Move(merged,path);
             }
             result=path;
-            try{CameraTrack.Store(path,0,motion,!systemCursor.IsChecked);}catch(IOException e){Alert(Language.Pick("Видео сохранено. Не удалось сохранить движение курсора. ", "Video saved. Could not save cursor movement. ")+e.Message);}
+            try{CameraTrack.Store(path,0,motion,!systemCursor.IsChecked);}catch(IOException e){Alert(InterfaceLanguage.Pick("Видео сохранено. Не удалось сохранить движение курсора. ", "Video saved. Could not save cursor movement. ")+e.Message);}
             try{foreach(var clip in clips)File.Delete(clip);File.Delete(Path.Combine(parts,"clips.txt"));Directory.Delete(parts);}catch(IOException){}
-            Status(Language.Pick("Сохранено: ", "Saved: ")+Path.GetFileName(path));
-        }catch(OperationCanceledException){Status(Language.Pick("Запись отменена", "Recording cancelled"));}
-        catch(Exception e){Status(Language.Pick("Ошибка записи", "Recording error"));Alert(e.Message+(parts!=null?Language.Pick("\nФайлы захвата: ", "\nCapture files: ")+parts:""));}
-        finally{if(job!=null)job.Stop();if(hud!=null)hud.Dispose();hud=null;resume=null;if(overlay!=null)overlay.Close();win.WindowState=WindowState.Normal;win.Show();if(cursor!=null)cursor.Dispose();cursor=null;if(indicator!=null)indicator.Dispose();indicator=null;if(job!=null)job.Dispose();job=null;if(countdown!=null)countdown.Dispose();countdown=null;busy=false;stopSent=false;Get<TextBlock>("RecordLabel").Text=Language.Pick("Записать", "Record");Update();}
+            Status(InterfaceLanguage.Pick("Сохранено: ", "Saved: ")+Path.GetFileName(path));
+        }catch(OperationCanceledException){Status(InterfaceLanguage.Pick("Запись отменена", "Recording cancelled"));}
+        catch(Exception e){Status(InterfaceLanguage.Pick("Ошибка записи", "Recording error"));Alert(e.Message+(parts!=null?InterfaceLanguage.Pick("\nФайлы захвата: ", "\nCapture files: ")+parts:""));}
+        finally{if(job!=null)job.Stop();if(hud!=null)hud.Dispose();hud=null;resume=null;if(overlay!=null)overlay.Close();win.WindowState=WindowState.Normal;win.Show();if(cursor!=null)cursor.Dispose();cursor=null;if(indicator!=null)indicator.Dispose();indicator=null;if(job!=null)job.Dispose();job=null;if(countdown!=null)countdown.Dispose();countdown=null;busy=false;stopSent=false;Get<TextBlock>("RecordLabel").Text=InterfaceLanguage.Pick("Записать", "Record");Update();}
         if(closing)win.Close();else if(result!=null)Open(result);
     }
     void Open(string path){var editor=new Editor(path);editor.Window.Owner=win;editor.Window.ShowDialog();}

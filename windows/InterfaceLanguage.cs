@@ -7,7 +7,7 @@ using System.Xml;
 using Microsoft.Win32;
 
 namespace Navodka {
-static class Language {
+static class InterfaceLanguage {
     const string Key = @"HKEY_CURRENT_USER\Software\Snapline";
     internal static readonly bool English = ((string)Registry.GetValue(Key, "Language", null)
         ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName) != "ru";

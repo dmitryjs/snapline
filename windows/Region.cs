@@ -25,7 +25,7 @@ class Region : Form {
             var label=new Rectangle(selection.Left,Math.Max(0,selection.Top-22),100,22);
             e.Graphics.FillRectangle(Brushes.Black,label);TextRenderer.DrawText(e.Graphics,size,Font,label,Color.White);
         }
-        e.Graphics.DrawString(Language.Pick("Выделите область мышью · Esc для отмены", "Drag to select an area · Esc to cancel"),Font,Brushes.White,18,18);
+        e.Graphics.DrawString(InterfaceLanguage.Pick("Выделите область мышью · Esc для отмены", "Drag to select an area · Esc to cancel"),Font,Brushes.White,18,18);
     }
     public static Rectangle? Pick(Rectangle bounds){using(var f=new Region(bounds)){if(f.ShowDialog()!=DialogResult.OK)return null;var r=f.selection;r.Offset(bounds.Location);return r;}}
 }

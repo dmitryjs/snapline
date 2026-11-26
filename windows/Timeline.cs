@@ -41,7 +41,7 @@ sealed class Timeline : Slider {
         foreach(var t in track.Intervals())Spans.Add(new ZoomSpan{Source=t.Item1,SourceLength=t.Item2-t.Item1,Start=t.Item1,End=t.Item2});
         Focusable=true;ClipToBounds=true;SmallChange=1.0/30;LargeChange=1;
         Template=new ControlTemplate(typeof(Slider));Cursor=Cursors.Hand;
-        System.Windows.Automation.AutomationProperties.SetName(this,Language.Pick("Позиция на таймлайне", "Timeline position"));
+        System.Windows.Automation.AutomationProperties.SetName(this,InterfaceLanguage.Pick("Позиция на таймлайне", "Timeline position"));
     }
     public void UpdateClip(double length,double from,double to,double zoom,bool follow,System.Collections.Generic.List<Annotation> effects,double scale){
         multiplier=scale;
@@ -161,12 +161,12 @@ sealed class Timeline : Slider {
                 for(double t=0;t<duration;t+=step/2){
                     double x=X(t);bool major=Math.Abs(t/step-Math.Round(t/step))<.01;
                     dc.DrawLine(pen,new Point(x,0),new Point(x,major?5:3));
-                    if(major && x<ActualWidth-23)Label(dc,t.ToString("0.##")+Language.Pick(" с", " s"),x+3,6,10,TextBrush);
+                    if(major && x<ActualWidth-23)Label(dc,t.ToString("0.##")+InterfaceLanguage.Pick(" с", " s"),x+3,6,10,TextBrush);
                 }
-                Block(dc,trimIn,trimOut,27,31,Purple,Language.Pick("Клип   ", "Clip   ")+(trimOut-trimIn).ToString("0.#")+Language.Pick(" с   1.0×", " s   1.0×"),Selected<0&&!ManualSelected);
-                if(auto)for(int i=0;i<Spans.Count;i++)Block(dc,Spans[i].Start,Spans[i].End,65,22,Blue,Language.Pick("Автозум   ", "Auto zoom   ")+multiplier.ToString("0.##")+"×",Selected==i);
+                Block(dc,trimIn,trimOut,27,31,Purple,InterfaceLanguage.Pick("Клип   ", "Clip   ")+(trimOut-trimIn).ToString("0.#")+InterfaceLanguage.Pick(" с   1.0×", " s   1.0×"),Selected<0&&!ManualSelected);
+                if(auto)for(int i=0;i<Spans.Count;i++)Block(dc,Spans[i].Start,Spans[i].End,65,22,Blue,InterfaceLanguage.Pick("Автозум   ", "Auto zoom   ")+multiplier.ToString("0.##")+"×",Selected==i);
                 if(annotations!=null)for(int i=0;i<annotations.Count;i++){var a=annotations[i];Block(dc,a.Start,a.End,109+23*lanes[i],19,Brush("#388063"),Annotation.Names[a.Kind]);}
-                if(manual>=0)Block(dc,manual,Math.Min(duration,manual+2),auto?89:65,17,Blue,Language.Pick("Зум   1,5×", "Zoom   1.5×"),ManualSelected);
+                if(manual>=0)Block(dc,manual,Math.Min(duration,manual+2),auto?89:65,17,Blue,InterfaceLanguage.Pick("Зум   1,5×", "Zoom   1.5×"),ManualSelected);
             }
         }
         group.Freeze();artwork=group;artworkSize=RenderSize;

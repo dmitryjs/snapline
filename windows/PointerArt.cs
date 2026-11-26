@@ -75,12 +75,12 @@ partial class Editor {
         lastSound=t;
     }
     PointerArt art;
-    static readonly string[] PointerNames={"",Language.Pick("Ореол", "Halo"),Language.Pick("Светлый", "Light"),Language.Pick("Тёмный", "Dark"),Language.Pick("Акцент", "Accent"),Language.Pick("Сирень", "Lilac"),Language.Pick("Стрела", "Arrow"),Language.Pick("Рука", "Hand")};
+    static readonly string[] PointerNames={"",InterfaceLanguage.Pick("Ореол", "Halo"),InterfaceLanguage.Pick("Светлый", "Light"),InterfaceLanguage.Pick("Тёмный", "Dark"),InterfaceLanguage.Pick("Акцент", "Accent"),InterfaceLanguage.Pick("Сирень", "Lilac"),InterfaceLanguage.Pick("Стрела", "Arrow"),InterfaceLanguage.Pick("Рука", "Hand")};
     static readonly string[] EffectNames={"None","Default","Ripple","Ring","Diffusion","Spotlight","Sparkle","Firework","Christmas"};
     void InitPointer(){
         var show=Get<CheckBox>("ShowPointer");
         show.IsChecked=camera.CleanCursor&&camera.HasPointer;
-        show.ToolTip=camera.CleanCursor?Language.Pick("Видимость указателя", "Pointer visibility"):Language.Pick("Системный курсор уже может быть частью записи. Переключатель управляет дополнительным указателем.", "The system cursor may already be in the recording. This controls the additional pointer.");
+        show.ToolTip=camera.CleanCursor?InterfaceLanguage.Pick("Видимость указателя", "Pointer visibility"):InterfaceLanguage.Pick("Системный курсор уже может быть частью записи. Переключатель управляет дополнительным указателем.", "The system cursor may already be in the recording. This controls the additional pointer.");
         cursorStyle=show.IsChecked==true?chosenPointer:0;show.Click+=(s,e)=>{cursorStyle=show.IsChecked==true?chosenPointer:0;RefreshPointer();};
         for(int i=1;i<PointerNames.Length;i++)AddPointerCard(false,i);
         for(int i=0;i<EffectNames.Length;i++)AddPointerCard(true,i);

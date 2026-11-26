@@ -15,7 +15,7 @@ static class ClickAudio {
     }
     public static void Write(Stream stream,double start,double end,IEnumerable<double> clicks){
         long count=(long)Math.Ceiling((end-start)*Rate);
-        if(count<=0 || count>(int.MaxValue-44)/2)throw new IOException(Language.Pick("Фрагмент слишком длинный для дорожки щелчков.", "Clip is too long for the click sound track."));
+        if(count<=0 || count>(int.MaxValue-44)/2)throw new IOException(InterfaceLanguage.Pick("Фрагмент слишком длинный для дорожки щелчков.", "Clip is too long for the click sound track."));
         var w=new BinaryWriter(stream,Encoding.ASCII,true);
         w.Write(Encoding.ASCII.GetBytes("RIFF"));w.Write((int)(36+count*2));w.Write(Encoding.ASCII.GetBytes("WAVEfmt "));
         w.Write(16);w.Write((short)1);w.Write((short)1);w.Write(Rate);w.Write(Rate*2);w.Write((short)2);w.Write((short)16);

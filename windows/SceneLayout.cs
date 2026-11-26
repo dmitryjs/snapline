@@ -66,6 +66,6 @@ sealed class Annotation {
         if(Kind==3 && !r.IsEmpty){double side=Math.Min(r.Width,r.Height);r=new Rect(r.X+(r.Width-side)/2,r.Y+(r.Height-side)/2,side,side);}
         return r;
     }
-    public override string ToString(){return Names[Kind]+"   "+Start.ToString("0.0")+"–"+End.ToString("0.0")+Language.Pick(" с", " s");}
+    public override string ToString(){return Names[Kind]+"   "+Start.ToString("0.0")+"–"+End.ToString("0.0")+InterfaceLanguage.Pick(" с", " s");}
 }
 }
