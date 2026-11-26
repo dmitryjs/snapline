@@ -1,0 +1,24 @@
+name: Investigate Windows release with Microsoft Defender
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - name: Verify archived evidence and scan extracted files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Invoke-WebRequest 'https://raw.githubusercontent.com/dmitryjs/snapline/1aea5af5db12d345180041f377fee5551a0ddcfd/Snapline-Windows-0.9.1-x64.zip' -OutFile sample.zip
+          if ((Get-FileHash sample.zip).Hash -ne 'a7b14c10410024a4b4fd5832caac9e1b0484f1cfa51bf3b32c6ed1c92b1b22c5') { throw 'Archive hash mismatch' }
+          Expand-Archive sample.zip -DestinationPath sample
+          if ((Get-FileHash sample/Snapline/Snapline.exe).Hash -ne 'e68705fdbf74209dd279f551ffe27206817c5ed79062c842a9f84a78b140e286') { throw 'Executable hash mismatch' }
+          Get-ChildItem sample -Recurse -Filter *.exe | Get-FileHash
+          Update-MpSignature
+          $status = Get-MpComputerStatus
+          $status | Select-Object AntivirusEnabled, AntivirusSignatureVersion, AntivirusSignatureLastUpdated | Format-List
+          if (!$status.AntivirusEnabled -or $status.AntivirusSignatureAge -gt 2) { throw 'Scanner unavailable or stale' }
+          & "$env:ProgramFiles/Windows Defender/MpCmdRun.exe" -Scan -ScanType 3 -File (Resolve-Path sample).Path -DisableRemediation
+          if ($LASTEXITCODE -ne 0) { throw "Scan exit $LASTEXITCODE" }
