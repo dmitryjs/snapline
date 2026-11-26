@@ -52,6 +52,15 @@ int main(void){@autoreleasepool{
     NSURL *dir=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString] isDirectory:YES];
     [NSFileManager.defaultManager createDirectoryAtURL:dir withIntermediateDirectories:YES attributes:nil error:nil];
     NSURL *source=[dir URLByAppendingPathComponent:@"source.mp4"];writeVideo(source);
+    ClipEditor *localized = [ClipEditor new];
+    NSString *code = [[NSUserDefaults standardUserDefaults] stringForKey:@"SnaplineLanguage"];
+    NSString *expected = [code isEqual:@"ru"] ? @"Исходный формат" : @"Original format";
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSPopUpButton *control = [localized valueForKey:@"format"];
+        require([control.itemArray.firstObject.title isEqual:expected], @"Incorrect editor language");
+        [NSApp stopModal];
+    });
+    [localized show:source];
     AVURLAsset *asset=[AVURLAsset URLAssetWithURL:source options:nil];ClipEditor *editor=[ClipEditor new];
     AVPlayerView *view=[AVPlayerView new];view.player=[AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
     [editor setValue:view forKey:@"view"];[editor setValue:asset forKey:@"asset"];

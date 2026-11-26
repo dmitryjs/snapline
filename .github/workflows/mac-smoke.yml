@@ -24,4 +24,5 @@ jobs:
       - name: Export a movie with an off-centre click and check the rendered pixels
         run: |
           xcrun clang -O2 -fobjc-arc -fblocks -framework Cocoa -framework CoreMedia -framework CoreVideo -framework CoreGraphics -framework AVFoundation -framework AVKit -framework CoreImage mac/test-editor.m -o "$RUNNER_TEMP/test-editor"
-          "$RUNNER_TEMP/test-editor"
+          "$RUNNER_TEMP/test-editor" -SnaplineLanguage en
+          "$RUNNER_TEMP/test-editor" -SnaplineLanguage ru
