@@ -1,3 +1,4 @@
+#import "Language.h"
 // AppKit and AVCaptureScreenInput both use a lower-left origin.
 @interface RegionView : NSView
 @property NSPoint anchor;
@@ -10,7 +11,7 @@
     [[NSColor colorWithWhite:0 alpha:0.42] setFill]; NSRectFill(self.bounds);
     [[NSColor colorWithWhite:1 alpha:0.25] setFill]; NSRectFill(self.selection);
     [NSColor.whiteColor setStroke]; [NSBezierPath strokeRect:self.selection];
-    [@"Выдели область мышью · Esc для отмены" drawAtPoint:NSMakePoint(28,28)
+    [SLText(@"Выдели область мышью · Esc для отмены", @"Drag to select an area · Esc to cancel") drawAtPoint:NSMakePoint(28,28)
         withAttributes:@{NSFontAttributeName:[NSFont boldSystemFontOfSize:19], NSForegroundColorAttributeName:NSColor.whiteColor}];
 }
 - (void)mouseDown:(NSEvent *)e { self.anchor = [self convertPoint:e.locationInWindow fromView:nil]; }

@@ -1,3 +1,4 @@
+#import "Language.h"
     NSSize available=NSScreen.mainScreen.visibleFrame.size;
     CGFloat width=MIN(1140,available.width-28), height=MIN(700,available.height-62);
     window=[[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,width,height) styleMask:NSWindowStyleMaskClosable|NSWindowStyleMaskTitled|NSWindowStyleMaskResizable backing:NSBackingStoreBuffered defer:NO];
@@ -8,19 +9,19 @@
     StudioPanel *sidebar=Panel(root,NSMakeRect(0,127,210,height-127),0x23252c);
     sidebar.autoresizingMask=NSViewHeightSizable;
     CGFloat top=sidebar.bounds.size.height;
-    StudioLabel(sidebar,@"Оформление",NSMakeRect(15,top-41,178,26),17,YES);
-    StudioLabel(sidebar,@"Формат кадра",NSMakeRect(15,top-82,178,20),12,NO);
+    StudioLabel(sidebar,SLText(@"Оформление", @"Appearance"),NSMakeRect(15,top-41,178,26),17,YES);
+    StudioLabel(sidebar,SLText(@"Формат кадра", @"Frame format"),NSMakeRect(15,top-82,178,20),12,NO);
     format=[[NSPopUpButton alloc] initWithFrame:NSMakeRect(10,top-121,187,34) pullsDown:NO];
-    [format addItemsWithTitles:@[@"Исходный формат",@"16:9",@"9:16",@"1:1",@"4:3"]];format.target=self;format.action=@selector(changeFormat);[sidebar addSubview:format];
-    StudioLabel(sidebar,@"Отступ",NSMakeRect(15,top-157,178,20),12,NO);
+    [format addItemsWithTitles:@[SLText(@"Исходный формат", @"Original format"),@"16:9",@"9:16",@"1:1",@"4:3"]];format.target=self;format.action=@selector(changeFormat);[sidebar addSubview:format];
+    StudioLabel(sidebar,SLText(@"Отступ", @"Padding"),NSMakeRect(15,top-157,178,20),12,NO);
     padding=[NSSlider sliderWithValue:0 minValue:0 maxValue:38 target:self action:@selector(changeFormat)];
     padding.frame=NSMakeRect(12,top-185,182,25);padding.continuous=NO;[sidebar addSubview:padding];
-    StudioLabel(sidebar,@"Цвет фона",NSMakeRect(15,top-223,178,20),12,NO);
+    StudioLabel(sidebar,SLText(@"Цвет фона", @"Background color"),NSMakeRect(15,top-223,178,20),12,NO);
     background=[[NSPopUpButton alloc] initWithFrame:NSMakeRect(10,top-264,187,34) pullsDown:NO];
-    [background addItemsWithTitles:@[@"Графит",@"Хвоя",@"Песочный",@"Белый",@"Индиго · градиент",@"Лагуна · градиент"]];background.target=self;background.action=@selector(changeFormat);[sidebar addSubview:background];
-    StudioLabel(sidebar,@"Приближение · 1,5×",NSMakeRect(15,top-299,188,21),12,NO);
-    NSButton *zoom=[NSButton buttonWithTitle:@"Зум здесь" target:self action:@selector(addZoom)];
-    NSButton *clearZoom=[NSButton buttonWithTitle:@"Убрать" target:self action:@selector(removeZoom)];
+    [background addItemsWithTitles:@[SLText(@"Графит", @"Graphite"),SLText(@"Хвоя", @"Pine"),SLText(@"Песочный", @"Sand"),SLText(@"Белый", @"White"),SLText(@"Индиго · градиент", @"Indigo · gradient"),SLText(@"Лагуна · градиент", @"Lagoon · gradient")]];background.target=self;background.action=@selector(changeFormat);[sidebar addSubview:background];
+    StudioLabel(sidebar,SLText(@"Приближение · 1,5×", @"Zoom · 1.5×"),NSMakeRect(15,top-299,188,21),12,NO);
+    NSButton *zoom=[NSButton buttonWithTitle:SLText(@"Зум здесь", @"Zoom here") target:self action:@selector(addZoom)];
+    NSButton *clearZoom=[NSButton buttonWithTitle:SLText(@"Убрать", @"Remove") target:self action:@selector(removeZoom)];
     zoom.frame=NSMakeRect(9,top-335,99,32);clearZoom.frame=NSMakeRect(109,top-335,87,32);
     [sidebar addSubview:zoom];[sidebar addSubview:clearZoom];
     for(NSView *child in sidebar.subviews)child.autoresizingMask=NSViewMinYMargin;
@@ -30,23 +31,23 @@
     view.controlsStyle=AVPlayerViewControlsStyleInline;[root addSubview:view];
     NSTextField *name=StudioLabel(root,source.lastPathComponent,NSMakeRect(226,height-42,width-422,22),14,YES);
     name.autoresizingMask=NSViewWidthSizable|NSViewMinYMargin;
-    NSButton *save=[self button:@"Экспорт MP4…" action:@selector(save) x:0 width:146];
+    NSButton *save=[self button:SLText(@"Экспорт MP4…", @"Export MP4…") action:@selector(save) x:0 width:146];
     save.frame=NSMakeRect(width-159,height-49,147,35);save.autoresizingMask=NSViewMinXMargin|NSViewMinYMargin;save.bezelColor=StudioColor(0x316cff);
     track=[[ClipTrack alloc] initWithFrame:NSMakeRect(8,13,width-16,65)];
     track.duration=CMTimeGetSeconds(asset.duration);track.autoresizingMask=NSViewWidthSizable;
     __weak ClipEditor *weakSelf=self;
     track.edit=^(NSInteger handle,double seconds){[weakSelf editTrack:handle seconds:seconds];};
-    track.toolTip=@"Нажми для перемотки. Потяни зелёный край для обрезки.";
+    track.toolTip=SLText(@"Нажми для перемотки. Потяни зелёный край для обрезки.", @"Click to seek. Drag a green edge to trim.");
     [root addSubview:track];
     rangeLabel=StudioLabel(root,@"",NSMakeRect(20,88,width-428,22),13,YES);rangeLabel.autoresizingMask=NSViewWidthSizable;
-    NSButton *inButton=[self button:@"Начало здесь" action:@selector(markIn) x:0 width:115];
-    NSButton *outButton=[self button:@"Конец здесь" action:@selector(markOut) x:0 width:115];
-    NSButton *reset=[self button:@"Сбросить" action:@selector(resetRange) x:0 width:97];
+    NSButton *inButton=[self button:SLText(@"Начало здесь", @"Start here") action:@selector(markIn) x:0 width:115];
+    NSButton *outButton=[self button:SLText(@"Конец здесь", @"End here") action:@selector(markOut) x:0 width:115];
+    NSButton *reset=[self button:SLText(@"Сбросить", @"Reset") action:@selector(resetRange) x:0 width:97];
     CGFloat x=width-365; for(NSButton *button in @[inButton,outButton,reset]){
         [button setFrameOrigin:NSMakePoint(x,81)];button.autoresizingMask=NSViewMinXMargin;x+=button.frame.size.width+5;
     }
     maskMenu=[[NSPopUpButton alloc] initWithFrame:NSMakeRect(10,top-408,187,32) pullsDown:NO];
-    [maskMenu addItemsWithTitles:@[@"Маска на 3 секунды…",@"Spotlight",@"Размытие",@"Лупа",@"Callout",@"Удалить последнюю"]];
+    [maskMenu addItemsWithTitles:@[SLText(@"Маска на 3 секунды…", @"Add a 3-second mask…"),@"Spotlight",SLText(@"Размытие", @"Blur"),SLText(@"Лупа", @"Magnifier"),@"Callout",SLText(@"Удалить последнюю", @"Remove last")]];
     maskMenu.target=self;maskMenu.action=@selector(pickMask);[sidebar addSubview:maskMenu];
     TrackDivider *divider=[[TrackDivider alloc] initWithFrame:NSMakeRect(218,129,width-226,6)];
     divider.autoresizingMask=NSViewWidthSizable;
@@ -62,7 +63,7 @@
         NSView *line=[editor->window.contentView viewWithTag:991];NSPoint pt=line.frame.origin;pt.y+=shift;[line setFrameOrigin:pt];
     };
     [root addSubview:divider];
-    autoZoom=[NSButton checkboxWithTitle:@"Автозум по кликам" target:self action:@selector(changeFormat)];
+    autoZoom=[NSButton checkboxWithTitle:SLText(@"Автозум по кликам", @"Zoom on clicks") target:self action:@selector(changeFormat)];
     autoZoom.frame=NSMakeRect(12,top-372,187,28);
     autoZoom.state=clickEvents.count?NSControlStateValueOn:NSControlStateValueOff;autoZoom.enabled=clickEvents.count>0;
     [sidebar addSubview:autoZoom]; [self changeFormat];

@@ -1,3 +1,4 @@
+#import "Language.h"
 #import <AVKit/AVKit.h>
 
 @interface ClipEditor : NSObject <NSWindowDelegate>
@@ -45,7 +46,7 @@
     asset = [AVURLAsset URLAssetWithURL:source options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@YES}];
     begin = kCMTimeZero; end = asset.duration;
     if (!isfinite(CMTimeGetSeconds(end)) || CMTimeGetSeconds(end)<=0 || ![asset tracksWithMediaType:AVMediaTypeVideo].count) {
-        NSAlert *alert=[NSAlert new]; alert.messageText=@"Не удалось прочитать видеозапись"; [alert runModal]; return;
+        NSAlert *alert=[NSAlert new]; alert.messageText=SLText(@"Не удалось прочитать видеозапись", @"Could not read recording"); [alert runModal]; return;
     }
 #include "editor-layout.inc"
 }
@@ -69,7 +70,7 @@
 }
 - (void)displayRange {
     track.startTime=CMTimeGetSeconds(begin);track.endTime=CMTimeGetSeconds(end);track.needsDisplay=YES;
-    rangeLabel.stringValue=[NSString stringWithFormat:@"Фрагмент   %.2f — %.2f с     ·     %.2f с",CMTimeGetSeconds(begin),CMTimeGetSeconds(end),CMTimeGetSeconds(CMTimeSubtract(end,begin))];
+    rangeLabel.stringValue=[NSString stringWithFormat:SLText(@"Фрагмент   %.2f — %.2f с     ·     %.2f с", @"Clip   %.2f — %.2f s     ·     %.2f s"),CMTimeGetSeconds(begin),CMTimeGetSeconds(end),CMTimeGetSeconds(CMTimeSubtract(end,begin))];
 }
 - (void)markIn {
     CMTime t=view.player.currentTime;
@@ -189,14 +190,14 @@
     panel.nameFieldStringValue=[original.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@"-edit.mp4"];
     if ([panel runModal]!=NSModalResponseOK) return;
     NSURL *target=panel.URL;
-    if ([target.URLByResolvingSymlinksInPath.path caseInsensitiveCompare:original.URLByResolvingSymlinksInPath.path]==NSOrderedSame) {rangeLabel.stringValue=@"Выбери новое имя, чтобы сохранить оригинал";return;}
+    if ([target.URLByResolvingSymlinksInPath.path caseInsensitiveCompare:original.URLByResolvingSymlinksInPath.path]==NSOrderedSame) {rangeLabel.stringValue=SLText(@"Выбери новое имя, чтобы сохранить оригинал", @"Choose a new name to keep the original");return;}
     NSURL *temp=[target.URLByDeletingLastPathComponent URLByAppendingPathComponent:[NSUUID.UUID.UUIDString stringByAppendingString:@".mp4"]];
     AVAssetExportSession *job=[[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPresetHighestQuality];
-    if (![job.supportedFileTypes containsObject:AVFileTypeMPEG4]) {rangeLabel.stringValue=@"Экспорт MP4 недоступен для этого файла";return;}
+    if (![job.supportedFileTypes containsObject:AVFileTypeMPEG4]) {rangeLabel.stringValue=SLText(@"Экспорт MP4 недоступен для этого файла", @"MP4 export unavailable for this file");return;}
     job.timeRange=CMTimeRangeFromTimeToTime(begin,end); job.outputURL=temp; job.outputFileType=AVFileTypeMPEG4;
     job.videoComposition=view.player.currentItem.videoComposition;
     exporting=YES; for(NSControl *c in controls)c.enabled=NO;
-    rangeLabel.stringValue=@"Экспортируем фрагмент…";
+    rangeLabel.stringValue=SLText(@"Экспортируем фрагмент…", @"Exporting clip…");
     [job exportAsynchronouslyWithCompletionHandler:^{ dispatch_async(dispatch_get_main_queue(), ^{
         NSError *err=job.error;
         BOOL ok=job.status==AVAssetExportSessionStatusCompleted;
@@ -207,7 +208,7 @@
         }
         if(!ok)[fm removeItemAtURL:temp error:nil];
         self->exporting=NO; for(NSControl *c in self->controls)c.enabled=YES;
-        self->rangeLabel.stringValue=ok ? [NSString stringWithFormat:@"Сохранено · %@",target.lastPathComponent] : err.localizedDescription ?: @"Экспорт прерван";
+        self->rangeLabel.stringValue=ok ? [NSString stringWithFormat:SLText(@"Сохранено · %@", @"Saved · %@"),target.lastPathComponent] : err.localizedDescription ?: SLText(@"Экспорт прерван", @"Export interrupted");
         if(ok)[NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[target]];
     }); }];
 }

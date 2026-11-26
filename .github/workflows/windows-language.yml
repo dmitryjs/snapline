@@ -1,0 +1,35 @@
+name: Windows interface language
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  interface:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Build the bilingual recorder
+        shell: pwsh
+        run: |
+          $tools = "Snapline-Windows-0.9.1-x64/Snapline/tools"
+          ./release/build-windows.ps1 -Ffmpeg "$tools/ffmpeg.exe" -Capture "$tools/capture.exe" -Output "$env:RUNNER_TEMP/bilingual"
+      - name: Open the recorder in each language
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $key = "HKCU:/Software/Snapline"
+          New-Item $key -Force | Out-Null
+          foreach ($case in @(@("ru","Snapline · Запись"), @("en","Snapline · Recorder"))) {
+            Set-ItemProperty $key Language $case[0]
+            $process = Start-Process "$env:RUNNER_TEMP/bilingual/Snapline/Snapline.exe" -PassThru
+            try {
+              for ($i=0; $i -lt 40; $i++) {
+                $process.Refresh()
+                if ($process.MainWindowTitle -eq $case[1]) { break }
+                if ($process.HasExited) { throw "Recorder exited during launch" }
+                Start-Sleep -Milliseconds 500
+              }
+              if ($process.MainWindowTitle -ne $case[1]) { throw "Unexpected window title: $($process.MainWindowTitle)" }
+            } finally {
+              if (!$process.HasExited) { Stop-Process -Id $process.Id }
+            }
+          }

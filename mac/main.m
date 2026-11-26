@@ -1,3 +1,4 @@
+#import "Language.h"
 #import <Cocoa/Cocoa.h>
 #ifdef NAVODKA_INTEL_COMPAT
 #import <AVFoundation/AVFoundation.h>
@@ -74,20 +75,20 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 #ifdef NAVODKA_INTEL_COMPAT
 #include "record-layout.inc"
 #else
-    [self label:@"Источник записи" frame:NSMakeRect(20,224,200,20)];
+    [self label:SLText(@"Источник записи", @"Recording source") frame:NSMakeRect(20,224,200,20)];
     sources = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(16,185,359,32) pullsDown:NO];
     [window.contentView addSubview:sources];
-    refresh = [self button:@"Обновить" selector:@selector(loadSources) frame:NSMakeRect(379,185,115,32)];
+    refresh = [self button:SLText(@"Обновить", @"Refresh") selector:@selector(loadSources) frame:NSMakeRect(379,185,115,32)];
     NSString *optionTitle =
 #ifdef NAVODKA_INTEL_COMPAT
-        @"Подсвечивать клики мыши";
+        SLText(@"Подсвечивать клики мыши", @"Highlight mouse clicks");
 #else
-        @"Записать звук приложений";
+        SLText(@"Записать звук приложений", @"Record application audio");
 #endif
     audio = [NSButton checkboxWithTitle:optionTitle target:nil action:NULL];
     audio.frame = NSMakeRect(20,151,365,24);
     [window.contentView addSubview:audio];
-    folderButton = [self button:@"Папка…" selector:@selector(chooseFolder) frame:NSMakeRect(15,107,109,32)];
+    folderButton = [self button:SLText(@"Папка…", @"Folder…") selector:@selector(chooseFolder) frame:NSMakeRect(15,107,109,32)];
 #endif
     NSString *saved = [NSUserDefaults.standardUserDefaults stringForKey:@"saveFolder"];
     folder = saved.length ? [NSURL fileURLWithPath:saved isDirectory:YES] :
@@ -96,8 +97,8 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
     destination.stringValue=folder.path;
 #else
     destination = [self label:folder.path frame:NSMakeRect(132,112,351,22)];
-    action = [self button:@"Записать" selector:@selector(toggle) frame:NSMakeRect(15,60,217,36)];
-    preview = [self button:@"Открыть последнюю запись" selector:@selector(openLast) frame:NSMakeRect(234,60,261,36)];
+    action = [self button:SLText(@"Записать", @"Record") selector:@selector(toggle) frame:NSMakeRect(15,60,217,36)];
+    preview = [self button:SLText(@"Открыть последнюю запись", @"Open last recording") selector:@selector(openLast) frame:NSMakeRect(234,60,261,36)];
     status = [self label:@"" frame:NSMakeRect(20,12,469,40)];
 #endif
     status.maximumNumberOfLines = 2;
@@ -120,7 +121,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
     refresh.enabled = idle && !loading;
     preview.enabled = idle && last != nil;
     action.enabled = (idle && !loading && sources.selectedItem != nil) || phase == Countdown || phase == Recording;
-    action.title = phase == Countdown ? @"Отменить" : phase == Recording ? @"Остановить и сохранить" : @"Записать";
+    action.title = phase == Countdown ? SLText(@"Отменить", @"Undo") : phase == Recording ? SLText(@"Остановить и сохранить", @"Stop and save") : SLText(@"Записать", @"Record");
 }
 #ifdef NAVODKA_INTEL_COMPAT
 #include "compat-recording.inc"
@@ -128,13 +129,13 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 - (void)loadSources {
     loading = YES;
     [sources removeAllItems];
-    status.stringValue = @"Получаем список экранов и окон…";
+    status.stringValue = SLText(@"Получаем список экранов и окон…", @"Finding displays and windows…");
     [self update];
     [SCShareableContent getShareableContentExcludingDesktopWindows:YES onScreenWindowsOnly:YES completionHandler:^(SCShareableContent *content, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self->loading = NO;
             for (SCDisplay *display in content.displays) {
-                NSString *name = [NSString stringWithFormat:@"Экран %ld · %ld × %ld", (long)self->sources.numberOfItems + 1, (long)display.width, (long)display.height];
+                NSString *name = [NSString stringWithFormat:SLText(@"Экран %ld · %ld × %ld", @"Display %ld · %ld × %ld"), (long)self->sources.numberOfItems + 1, (long)display.width, (long)display.height];
                 [self->sources.menu addItemWithTitle:name action:NULL keyEquivalent:@""].representedObject = display;
             }
             for (SCWindow *item in content.windows) {
@@ -143,7 +144,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
                 [self->sources.menu addItemWithTitle:name action:NULL keyEquivalent:@""].representedObject = item;
             }
             if (self->sources.numberOfItems) [self->sources selectItemAtIndex:0];
-            self->status.stringValue = error ? @"Разреши запись экрана в настройках конфиденциальности macOS и открой «Snapline» снова." : self->sources.numberOfItems ? @"Готово к записи" : @"Источники не найдены. Нажми «Обновить».";
+            self->status.stringValue = error ? SLText(@"Разреши запись экрана в настройках конфиденциальности macOS и открой «Snapline» снова.", @"Allow screen recording in macOS privacy settings, then reopen Snapline.") : self->sources.numberOfItems ? SLText(@"Готово к записи", @"Ready to record") : SLText(@"Источники не найдены. Нажми «Обновить».", @"No sources found. Click Refresh.");
             [self update];
         });
     }];
@@ -163,7 +164,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 #ifdef NAVODKA_INTEL_COMPAT
     if(last) [self editURL:last];
 #else
-    if (last && ![NSWorkspace.sharedWorkspace openURL:last]) status.stringValue = @"Не удалось открыть сохранённую запись.";
+    if (last && ![NSWorkspace.sharedWorkspace openURL:last]) status.stringValue = SLText(@"Не удалось открыть сохранённую запись.", @"Could not open the saved recording.");
 #endif
 }
 - (void)reset:(NSString *)message {
@@ -184,7 +185,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 }
 - (void)toggle {
     if (phase == Recording) { [self stop]; return; }
-    if (phase == Countdown) { ++generation; [self reset:@"Запись отменена"]; return; }
+    if (phase == Countdown) { ++generation; [self reset:SLText(@"Запись отменена", @"Recording cancelled")]; return; }
     if (phase != Idle) return;
     phase = Countdown;
     [self update];
@@ -193,7 +194,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 - (void)count:(NSInteger)n generation:(NSUInteger)token {
     if (generation != token || phase != Countdown) return;
     if (n == 0) { [self start]; return; }
-    status.stringValue = [NSString stringWithFormat:@"До записи: %ld", (long)n];
+    status.stringValue = [NSString stringWithFormat:SLText(@"До записи: %ld", @"Recording in %ld"), (long)n];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self count:n-1 generation:token]; });
 }
 #ifndef NAVODKA_INTEL_COMPAT
@@ -208,11 +209,11 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
         filter = [[SCContentFilter alloc] initWithDisplay:item excludingWindows:@[]];
     } else if ([item isKindOfClass:SCWindow.class]) {
         filter = [[SCContentFilter alloc] initWithDesktopIndependentWindow:item];
-    } else { [self reset:@"Обнови список источников"]; return; }
+    } else { [self reset:SLText(@"Обнови список источников", @"Refresh sources")]; return; }
     SCStreamConfiguration *cfg = [SCStreamConfiguration new];
     CGFloat width = CGRectGetWidth(filter.contentRect) * filter.pointPixelScale;
     CGFloat height = CGRectGetHeight(filter.contentRect) * filter.pointPixelScale;
-    if (width < 2 || height < 2) { [self reset:@"Источник больше недоступен"]; return; }
+    if (width < 2 || height < 2) { [self reset:SLText(@"Источник больше недоступен", @"Source no longer available")]; return; }
     // Bound the long and short sides to a 1080p canvas in either orientation.
     CGFloat scale = MIN(1, MIN(1920 / MAX(width,height), 1080 / MIN(width,height)));
     cfg.width = MAX(2, (NSInteger)(width * scale) & ~1);
@@ -228,7 +229,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
     output = [[SCRecordingOutput alloc] initWithConfiguration:file delegate:self];
     if (![stream addRecordingOutput:output error:&error]) { [self reset:error.localizedDescription]; return; }
     phase = Starting;
-    status.stringValue = @"Запускаем запись…";
+    status.stringValue = SLText(@"Запускаем запись…", @"Starting recording…");
     [self update];
     SCStream *session = stream;
     [session startCaptureWithCompletionHandler:^(NSError *failure) {
@@ -241,14 +242,14 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sender != self->output || self->phase != Starting) return;
         self->phase = Recording;
-        self->status.stringValue = @"Идёт запись";
+        self->status.stringValue = SLText(@"Идёт запись", @"Recording");
         [self update];
         if (self->quitting) [self stop];
     });
 }
 - (void)stop {
     phase = Finishing;
-    status.stringValue = @"Сохраняем MP4…";
+    status.stringValue = SLText(@"Сохраняем MP4…", @"Saving MP4…");
     [self update];
     SCStream *session = stream;
     [session stopCaptureWithCompletionHandler:^(NSError *error) {
@@ -267,7 +268,7 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
             [self reset:error.localizedDescription]; return;
         }
         self->last = finished;
-        [self reset:@"Запись сохранена"];
+        [self reset:SLText(@"Запись сохранена", @"Recording saved")];
     });
 }
 - (void)recordingOutput:(SCRecordingOutput *)sender didFailWithError:(NSError *)error {
@@ -295,6 +296,20 @@ typedef NS_ENUM(NSInteger, Phase) { Idle, Countdown, Starting, Recording, Finish
 }
 @end
 
+@implementation NSApplication (SnaplineLanguageMenu)
+- (void)snaplineSelectLanguage:(NSMenuItem *)sender {
+    NSString *code = sender.representedObject;
+    [[NSUserDefaults standardUserDefaults] setObject:code forKey:@"SnaplineLanguage"];
+    for (NSMenuItem *item in sender.menu.itemArray)
+        item.state = item == sender ? NSControlStateValueOn : NSControlStateValueOff;
+    NSAlert *notice = [NSAlert new];
+    notice.messageText = [code isEqualToString:@"en"] ?
+        @"English will be used the next time you open Snapline." :
+        @"Русский язык включится при следующем запуске Snapline.";
+    [notice runModal];
+}
+@end
+
 int main(void) {
     @autoreleasepool {
         NSApplication *app = NSApplication.sharedApplication;
@@ -304,7 +319,17 @@ int main(void) {
         NSMenu *bar = [NSMenu new];
         NSMenuItem *root = [bar addItemWithTitle:@"" action:NULL keyEquivalent:@""];
         root.submenu = [NSMenu new];
-        [root.submenu addItemWithTitle:@"Завершить Snapline" action:@selector(terminate:) keyEquivalent:@"q"];
+        NSMenuItem *language = [root.submenu addItemWithTitle:SLText(@"Язык", @"Language") action:NULL keyEquivalent:@""];
+        language.submenu = [NSMenu new];
+        for (NSString *code in @[@"ru", @"en"]) {
+            BOOL english = [code isEqualToString:@"en"];
+            NSMenuItem *item = [language.submenu addItemWithTitle:(english ? @"English" : @"Русский")
+                action:@selector(snaplineSelectLanguage:) keyEquivalent:@""];
+            item.target = app;
+            item.representedObject = code;
+            item.state = english == SLEnglish() ? NSControlStateValueOn : NSControlStateValueOff;
+        }
+        [root.submenu addItemWithTitle:SLText(@"Завершить Snapline", @"Quit Snapline") action:@selector(terminate:) keyEquivalent:@"q"];
         app.mainMenu = bar;
         [app run];
     }

@@ -1,27 +1,32 @@
-<p align="center"><img src="assets/icon.png" width="112" alt="Иконка Snapline"></p>
+<p align="center"><img src="assets/icon.png" width="112" alt="Snapline icon"></p>
 <h1 align="center">Snapline</h1>
-<p align="center">Запись экрана и монтаж скринкастов на Windows и Mac.</p>
+<p align="center">Record your screen and edit screencasts on Windows and Mac.</p>
 
-<p align="center"><a href="#install">Установка</a> · <a href="#editor">Редактор</a> · <a href="https://github.com/dmitryjs/snapline/releases">Все версии</a></p>
+<p align="center"><a href="README.ru.md">Русский</a> · <a href="#install">Installation</a> · <a href="#editor">Editor</a> · <a href="https://github.com/dmitryjs/snapline/releases">Releases</a></p>
 
 <a id="install"></a>
 
-## Установка
+## Installation
 
-Snapline 0.9.1 — ранняя версия. Скачивание обеих сборок временно приостановлено. Я выясняю причину антивирусных предупреждений. [Статус выпуска](https://github.com/dmitryjs/snapline/releases/tag/desktop-1)
+Snapline 0.9.1 is an early release. Downloads for both platforms are paused while I investigate antivirus alerts. [Release status](https://github.com/dmitryjs/snapline/releases/tag/desktop-1)
 
-| Версия | Совместимость | Формат |
+| Edition | Compatibility | Package |
 | --- | --- | --- |
-| Windows | Windows 10 22H2 или Windows 11, x64 | ZIP с приложением и компонентами записи |
-| Mac Preview | macOS 10.15+ на Intel или macOS 11+ на Apple Silicon | ZIP с универсальным приложением Snapline.app |
+| Windows | Windows 10 22H2 or Windows 11, x64 | ZIP containing the app and recording tools |
+| Mac Preview | macOS 10.15+ on Intel or macOS 11+ on Apple silicon | ZIP containing the universal Snapline.app |
+
+## Interface language
+
+In builds from the current source, open **File → Language** on Windows or **Snapline → Language** on Mac. Choose **English** or **Русский**, then restart Snapline. On first launch, Russian is selected on Russian-language systems and English on other systems. The original 0.9.1 downloads predate this setting.
 
 <a id="editor"></a>
 
-## Редактор
+## Editor
 
-В версии для Windows можно обрезать запись, перемещать зум на таймлайне и добавлять маски. При приближении фон с отступами остаётся на месте.
+On Windows, trim a recording, move zoom segments on the timeline, and add masks. The padded background stays fixed as the recording zooms in.
 
-![Редактор Snapline для Windows с предпросмотром и таймлайном](assets/editor.png)
+![Snapline for Windows showing the recording preview and editing timeline](assets/editor.png)
 
-В предварительной сборке для Mac доступны запись экрана или области, микрофон, пауза записи, выбор разрешения до 2160p, автозум по кликам, ручной зум, маски на три секунды, градиенты, обрезка и экспорт MP4. Для повторного редактирования автозума храните файл .snapclicks рядом с оригинальным видео. На macOS 15 проверены запуск опубликованного приложения и экспорт тестового MP4 с автозумом и фиксированным фоном. Захват реального экрана с разрешениями macOS ещё требует проверки. [Результат теста](https://github.com/dmitryjs/snapline/actions/runs/45769644832). Расширенные настройки курсора и дорожки эффектов пока доступны в Windows.
+The Mac preview supports screen or region capture, microphone audio, pause and resume, capture resolutions up to 2160p, automatic click zoom, manual zoom, three-second masks, gradients, trimming, and MP4 export. Keep the .snapclicks file next to the original recording to edit automatic zooms later.
 
+The published Mac preview launched and exported a test MP4 with automatic zoom and a fixed background on macOS 15. Live screen capture with macOS permissions still needs testing. Advanced cursor settings and effect tracks are available on Windows. [Mac verification run](https://github.com/dmitryjs/snapline/actions/runs/45769644832)
