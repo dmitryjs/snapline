@@ -1,0 +1,23 @@
+name: macOS preview verification
+on: [workflow_dispatch, push]
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: macos-15
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Build both architectures from source
+        run: bash mac/build-universal.sh
+      - name: Verify and launch the published app
+        run: |
+          curl --fail --location 'https://raw.githubusercontent.com/dmitryjs/snapline/fb0b59705271315397d95f4218a9e3e772b16a32/Snapline-macOS-0.9.1-preview.zip' --output release.zip
+          echo '36bf36a07fd4a47d7769934e3ff7f5152339dae04b95d85db2caf8570a0835e5  release.zip' | shasum -a 256 --check
+          ditto -xk release.zip extracted
+          codesign --verify --deep --strict extracted/Snapline.app
+          extracted/Snapline.app/Contents/MacOS/Snapline &
+          pid=$!
+          sleep 8
+          kill -0 "$pid"
+          kill "$pid"
