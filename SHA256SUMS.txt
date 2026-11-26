@@ -1,2 +1,3 @@
 2ba9a3cccc383f83f7dd8ddd7d4b8d111b41b00ee3b3c55a98d23b31b0cbddd0  Navodka-Intel-0.3.0.zip
 a7b14c10410024a4b4fd5832caac9e1b0484f1cfa51bf3b32c6ed1c92b1b22c5  Snapline-Windows-0.9.1-x64.zip
+36bf36a07fd4a47d7769934e3ff7f5152339dae04b95d85db2caf8570a0835e5  Snapline-macOS-0.9.1-preview.zip
